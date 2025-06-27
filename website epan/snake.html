@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake Gaya Google</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to right, #2e0249, #090979);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 8px solid #2d742d;
+    }
+    .score {
+      margin-top: 15px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Snake Gaya Google</h2>
+  <canvas id="game" width="450" height="450"></canvas>
+  <div class="score" id="score">Skor: 0</div>
+  <audio id="eat-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_6787e4cf30.mp3" preload="auto"></audio>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const scale = 15;
+    const rows = canvas.height / scale;
+    const cols = canvas.width / scale;
+
+    let snake = [{x: 5, y: 5}];
+    let direction = "RIGHT";
+    let food = {};
+    let score = 0;
+
+    const eatSound = document.getElementById("eat-sound");
+
+    function drawGrid() {
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          ctx.fillStyle = (x + y) % 2 === 0 ? "#b9f27c" : "#a1e36d";
+          ctx.fillRect(x * scale, y * scale, scale, scale);
+        }
+      }
+    }
+
+    function drawSnake() {
+      snake.forEach((part, index) => {
+        const px = part.x * scale;
+        const py = part.y * scale;
+
+        // Bayangan
+        ctx.fillStyle = "rgba(0,0,0,0.1)";
+        ctx.beginPath();
+        ctx.ellipse(px + 7.5, py + 15, 7, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Tubuh
+        ctx.fillStyle = "#1877f2";
+        ctx.beginPath();
+        ctx.roundRect(px, py, scale, scale, 7);
+        ctx.fill();
+
+        // Kepala
+        if (index === 0) {
+          // Mata
+          ctx.fillStyle = "white";
+          ctx.beginPath();
+          ctx.arc(px + 5, py + 5, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(px + 10, py + 5, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "black";
+          ctx.beginPath();
+          ctx.arc(px + 5, py + 5, 1, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(px + 10, py + 5, 1, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Mulut
+          ctx.fillStyle = "black";
+          ctx.fillRect(px + 5, py + 10, 5, 2);
+        }
+      });
+    }
+
+    function drawFood() {
+      const x = food.x * scale;
+      const y = food.y * scale;
+
+      // Bayangan buah
+      ctx.fillStyle = "rgba(0,0,0,0.15)";
+      ctx.beginPath();
+      ctx.arc(x + scale/2 + 2, y + scale/2 + 2, scale / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Buah
+      const grad = ctx.createRadialGradient(x + 5, y + 5, 1, x + scale/2, y + scale/2, scale / 2);
+      grad.addColorStop(0, "white");
+      grad.addColorStop(0.3, "#ff4d4d");
+      grad.addColorStop(1, "#c00000");
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(x + scale / 2, y + scale / 2, scale / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Daun
+      ctx.fillStyle = "green";
+      ctx.beginPath();
+      ctx.ellipse(x + scale / 2 + 5, y + scale / 2 - 5, 3, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function placeFood() {
+      food = {
+        x: Math.floor(Math.random() * cols),
+        y: Math.floor(Math.random() * rows)
+      };
+    }
+
+    function moveSnake() {
+      const head = { ...snake[0] };
+      if (direction === "RIGHT") head.x++;
+      else if (direction === "LEFT") head.x--;
+      else if (direction === "UP") head.y--;
+      else if (direction === "DOWN") head.y++;
+
+      if (head.x < 0 || head.y < 0 || head.x >= cols || head.y >= rows || snake.some(p => p.x === head.x && p.y === head.y)) {
+        alert("Game Over! Skor kamu: " + score);
+        document.location.reload();
+        return;
+      }
+
+      snake.unshift(head);
+
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        eatSound.currentTime = 0;
+        eatSound.play();
+        document.getElementById("score").textContent = "Skor: " + score;
+        placeFood();
+      } else {
+        snake.pop();
+      }
+    }
+
+    function gameLoop() {
+      moveSnake();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+      drawFood();
+      drawSnake();
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+      else if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+      else if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+      else if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+    });
+
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+      this.beginPath();
+      this.moveTo(x + r, y);
+      this.lineTo(x + w - r, y);
+      this.quadraticCurveTo(x + w, y, x + w, y + r);
+      this.lineTo(x + w, y + h - r);
+      this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      this.lineTo(x + r, y + h);
+      this.quadraticCurveTo(x, y + h, x, y + h - r);
+      this.lineTo(x, y + r);
+      this.quadraticCurveTo(x, y, x + r, y);
+      this.closePath();
+    };
+
+    placeFood();
+    setInterval(gameLoop, 100);
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Pilihan Game</title>
+  <style>
+    body {
+       margin: 0;
+      height: 100vh;
+      background: linear-gradient(to right, #2e0249, #090979);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    .btn-container {
+      display: flex;
+      gap: 20px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 20px;
+      border: none;
+      background-color: purple;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2 id="greeting">Halo!</h2>
+  <p>Silakan pilih permainan:</p>
+  <div class="btn-container">
+    <button onclick="window.location.href='tictactoe.html'">TicTacToe</button>
+    <button onclick="window.location.href='snake.html'">Snake</button>
+  </div>
+
+  <script>
+    const nama = localStorage.getItem("nama") || "Teman";
+    document.getElementById("greeting").textContent = `Halo, ${nama}!`;
+  </script>
+</body>
+</html>

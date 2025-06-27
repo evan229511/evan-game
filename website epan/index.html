@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selamat Datang</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #2e003e, #000428, #000);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+    .watermark span {
+      position: absolute;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.04);
+      transform: rotate(-30deg);
+      user-select: none;
+    }
+    .container {
+      text-align: center;
+      z-index: 1;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .input-group {
+      margin-top: 1rem;
+    }
+    input[type="text"] {
+      padding: 1rem;
+      border-radius: 30px;
+      border: 1px solid #6c00ff;
+      outline: none;
+      font-size: 1rem;
+      width: 300px;
+      text-align: left;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #6c00ff;
+      text-align: left;
+      margin-left: 30px;
+    }
+    .button {
+      margin-top: 1.5rem;
+      background-color: #111;
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="watermark" id="watermark"></div>
+
+  <div class="container">
+    <h1>Selamat Datang<br>kembali</h1>
+    <div class="input-group">
+      <label for="email">Isi Nama</label>
+      <input type="text" id="Nama" placeholder="Evan">
+    </div>
+    <button class="button" onclick="goToNext()">Melanjutkan</button>
+  </div>
+
+  <script>
+    const watermark = document.getElementById('watermark');
+    for (let x = 0; x < window.innerWidth; x += 100) {
+      for (let y = 0; y < window.innerHeight; y += 60) {
+        const span = document.createElement('span');
+        span.textContent = 'web.vEpan';
+        span.style.left = `${x}px`;
+        span.style.top = `${y}px`;
+        watermark.appendChild(span);
+      }
+    }
+
+    function goToNext() {
+      const name = document.getElementById("email").value.trim();
+      if (name !== "") {
+        localStorage.setItem("username", name);
+        window.location.href = "halaman.html";
+      } else {
+        alert("Masukkan nama terlebih dahulu.");
+      }
+    }
+  </script>
+</body>
+</html>

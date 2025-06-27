@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>TicTacToe</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(to right, #2e0249, #090979);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      font-family: Arial, sans-serif;
+      color: white;
+      padding-top: 40px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    .mode-btns {
+      margin-bottom: 20px;
+    }
+    .mode-btns button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      background-color: purple;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+    }
+    .cell {
+      background-color: rgba(255,255,255,0.1);
+      border: 2px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      cursor: pointer;
+      color: white;
+    }
+    .info {
+      margin-top: 20px;
+    }
+    .restart {
+      margin-top: 15px;
+      padding: 8px 20px;
+      border-radius: 10px;
+      border: none;
+      background-color: violet;
+      color: black;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Tic Tac Toe</h2>
+  <div class="mode-btns">
+    <button onclick="startGame('pvp')">2 Pemain</button>
+    <button onclick="startGame('ai')">Vs Komputer</button>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="info" id="info"></div>
+  <button class="restart" onclick="resetGame()">Restart</button>
+
+  <script>
+    const boardEl = document.getElementById('board');
+    const infoEl = document.getElementById('info');
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let mode = 'pvp';
+    let gameOver = false;
+
+    function startGame(selectedMode) {
+      mode = selectedMode;
+      resetGame();
+      infoEl.textContent = `Giliran: ${currentPlayer}`;
+    }
+
+    function renderBoard() {
+      boardEl.innerHTML = '';
+      board.forEach((cell, index) => {
+        const cellEl = document.createElement('div');
+        cellEl.className = 'cell';
+        cellEl.textContent = cell;
+        cellEl.addEventListener('click', () => handleMove(index));
+        boardEl.appendChild(cellEl);
+      });
+    }
+
+    function handleMove(index) {
+      if (board[index] !== '' || gameOver) return;
+
+      board[index] = currentPlayer;
+      renderBoard();
+      if (checkWinner()) {
+        infoEl.textContent = `${currentPlayer} Menang!`;
+        gameOver = true;
+        return;
+      } else if (board.every(cell => cell !== '')) {
+        infoEl.textContent = `Seri!`;
+        gameOver = true;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      infoEl.textContent = `Giliran: ${currentPlayer}`;
+
+      if (mode === 'ai' && currentPlayer === 'O' && !gameOver) {
+        setTimeout(AIMove, 500);
+      }
+    }
+
+    function AIMove() {
+      // Simple AI: pilih kotak kosong pertama
+      let emptyIndices = board.map((val, idx) => val === '' ? idx : null).filter(i => i !== null);
+      let choice = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      handleMove(choice);
+    }
+
+    function checkWinner() {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      return winPatterns.some(([a,b,c]) => {
+        return board[a] && board[a] === board[b] && board[b] === board[c];
+      });
+    }
+
+    function resetGame() {
+      board = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      gameOver = false;
+      renderBoard();
+      infoEl.textContent = `Giliran: ${currentPlayer}`;
+    }
+
+    startGame('pvp');
+  </script>
+</body>
+</html>
